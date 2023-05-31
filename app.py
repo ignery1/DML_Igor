@@ -5,7 +5,7 @@ import numpy as np
  
 
 # loading the trained model.
-model = load_model('modelo_pronto')
+model = load_model('model')
 
 # carregando uma amostra dos dados.
 dataset = pd.read_csv('estudantes.csv') 
