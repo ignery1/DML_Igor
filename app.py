@@ -1,5 +1,4 @@
 
-
 import pandas as pd
 import streamlit as st
 from pycaret.regression import *
@@ -23,15 +22,7 @@ test_preparation_course = st.sidebar.selectbox('Test preparation course', ('None
 lunch = st.sidebar.selectbox('Lunch', ('Free/Reduced', 'Standard'))
 
 #Convert the input data to a Pandas DataFrame
-data_test = pd.DataFrame({
-'reading_score': [reading_score],
-'writing_score': [writing_score],
-'gender': [gender],
-'ethnicity': [ethnicity],
-'parental_education': [parental_education],
-'test_preparation_course': [test_preparation_course],
-'lunch': [lunch]
-})
+data_test = pd.DataFrame(dataset, columns=['reading_score', 'writing_score', 'gender', 'ethnicity', 'parental_education', 'test_preparation_course', 'lunch'])
 
 #Make a prediction
 prediction = model.predict(data_test)
@@ -39,4 +30,3 @@ prediction = model.predict(data_test)
 #Display the prediction
 st.subheader('Predicted math score:')
 st.write(round(prediction[0], 2))
-
