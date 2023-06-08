@@ -3,7 +3,7 @@ import streamlit as st
 import joblib
 
 # Carregando o modelo treinado
-model = joblib.load('model')
+model = joblib.load('model.pkl')
 
 # Carregando os dados dos estudantes
 dataset = pd.read_csv('estudantes.csv')
