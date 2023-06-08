@@ -32,17 +32,22 @@ atributos_aluno = {
     'almoco': st.sidebar.selectbox("Tipo de Almoço", ('Gratuito/Reduzido', 'Padrão'))
 }
 
+# Selecionando as colunas relevantes do dataset
+colunas_relevantes = ['nota_leitura', 'nota_escrita', 'genero', 'etinia', 'educacao_pais', 'curso_preparacao', 'almoco']
+data_teste = dataset[colunas_relevantes].copy()
+
+# Preenchendo o data_teste com base nos atributos do aluno
+data_teste = data_teste.append(atributos_aluno, ignore_index=True)
+
+# Mapeando os valores categóricos para numéricos
+for col, mapping in categorical_mapping.items():
+    data_teste[col] = data_teste[col].map(mapping)
+
 # Realizando a predição quando o botão for acionado
 btn_predict = st.sidebar.button("Realizar Predição")
 
 if btn_predict:
-    data_teste = pd.DataFrame([atributos_aluno])
-
-    # Mapeando os valores categóricos para numéricos
-    for col, mapping in categorical_mapping.items():
-        data_teste[col] = data_teste[col].map(mapping)
-
-    result = model.predict(data_teste)
+    result = model.predict(data_teste[-1:])
     result = round(result[0], 2)
 
     st.subheader("Nota de matemática predita:")
