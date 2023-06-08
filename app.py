@@ -7,6 +7,8 @@ model = joblib.load('model.pkl')
 
 # Carregando os dados dos estudantes
 dataset = pd.read_csv('estudantes.csv')
+print(dataset.columns)
+
 
 # Criando um dicionário para mapear os valores das variáveis categóricas
 categorical_mapping = {
