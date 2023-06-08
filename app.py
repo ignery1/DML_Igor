@@ -1,101 +1,49 @@
 import pandas as pd
 import streamlit as st
-from pycaret.regression import *
-import numpy as np
- 
+from pycaret.regression import load_model
 
-# loading the trained model.
-model = load_model('modelo')
+model = load_model('model')
+dataset = pd.read_csv('estudantes.csv')
 
-# carregando uma amostra dos dados.
-dataset = pd.read_csv('estudantes.csv') 
-#classifier = pickle.load(pickle_in)
+gender_mapping = {"Feminino": 1, "Masculino": 0}
+ethnicity_mapping = {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5}
+education_mapping = {"AD": 1, "BD": 2, "HS": 3, "SC": 4, "SHS": 5}
+prep_course_mapping = {"Nenhum": 0, "Completo": 1}
+lunch_mapping = {"Gratuito/Reduzido": 0, "Padrão": 1}
 
-# título
 st.title("Predição de notas de matemática")
+st.markdown("Este é um aplicativo de dados usado para prever notas de matemática usando Machine Learning.")
 
-# subtítulo
-st.markdown("Dupla: Leonardo Rodrigues / Vitor Matos")
-
-
-
-st.sidebar.subheader("Defina os atributos do aluno para a predição da nota de matemática")
-
-
-# mapeando dados do usuário para cada atributo
 nota_leitura = st.sidebar.number_input("Nota de Leitura")
 nota_escrita = st.sidebar.number_input("Nota de Escrita")
+genero = st.sidebar.selectbox("Gênero do Aluno", list(gender_mapping.keys()))
+etinia = st.sidebar.selectbox("Raça/Etnia", list(ethnicity_mapping.keys()))
+educacao_pais = st.sidebar.selectbox("Grau de Escolaridade dos Pais", list(education_mapping.keys()))
+curso_preparacao = st.sidebar.selectbox("Curso Preparatório para Teste", list(prep_course_mapping.keys()))
+almoco = st.sidebar.selectbox("Tipo de Almoço", list(lunch_mapping.keys()))
 
+data_teste = pd.DataFrame({
+    "nota_leitura": [nota_leitura],
+    "nota_escrita": [nota_escrita],
+    "female": [gender_mapping[genero]],
+    "male": [1 - gender_mapping[genero]],
+    "A": [1 if etinia == "A" else 0],
+    "B": [1 if etinia == "B" else 0],
+    "C": [1 if etinia == "C" else 0],
+    "D": [1 if etinia == "D" else 0],
+    "E": [1 if etinia == "E" else 0],
+    "AD": [1 if educacao_pais == "AD" else 0],
+    "BD": [1 if educacao_pais == "BD" else 0],
+    "HS": [1 if educacao_pais == "HS" else 0],
+    "SC": [1 if educacao_pais == "SC" else 0],
+    "SHS": [1 if educacao_pais == "SHS" else 0],
+    "FR": [lunch_mapping[almoco]],
+    "S": [1 - lunch_mapping[almoco]],
+    "completed": [prep_course_mapping[curso_preparacao]],
+    "none": [1 - prep_course_mapping[curso_preparacao]]
+})
 
-genero = st.sidebar.selectbox("Gênero do Aluno",("Feminino","Masculino"))
-etinia = st.sidebar.selectbox("Raça/Etinia",("A","B","C","D","E"))
-educacao_pais = st.sidebar.selectbox("Grau de Escolaridade",("BD","SC","MD","AD","HS", "SHS"))
-curso_preparacao = st.sidebar.selectbox("Curso Preparatório para Teste",("Nenhum","Completo"))
-almoco = st.sidebar.selectbox("Tipo de Almoço",("Gratuito/Reduzido","Padrão"))
+predicted_math_score = model.predict(data_teste)[0]
 
-# transformando o dado de entrada em valor binário
-female = 1 if genero == "Feminino" else 0
-male = 1 if genero == "Masculino" else 0
-
-A = 1 if etinia == "A" else 0
-B = 1 if etinia == "B" else 0
-C = 1 if etinia == "C" else 0
-D = 1 if etinia == "D" else 0
-E = 1 if etinia == "E" else 0
-
-AD = 1 if educacao_pais == "AD" else 0
-BD = 1 if educacao_pais == "BD" else 0
-HS = 1 if educacao_pais == "HS" else 0
-SC = 1 if educacao_pais == "SC" else 0
-SHS = 1 if educacao_pais == "SHS" else 0
-
-
-completed = 1 if curso_preparacao == "Completo" else 0
-none = 1 if curso_preparacao == "Nenhum" else 0
-
-FR = 1 if almoco == "Gratuito/Reduzido" else 0
-S = 1 if almoco == "Padrão" else 0
-
-
-# inserindo um botão na tela
-btn_predict = st.sidebar.button("Realizar Predição")
-btn_data = st.sidebar.button("Visualizar Dados")
-
-if btn_data:
-    st.table(dataset)
-
-# verifica se o botão foi acionado
-if btn_predict:
-    data_teste = pd.DataFrame()
-
-    data_teste["nota_leitura"] =	[nota_leitura]
-    data_teste["nota_escrita"] =	[nota_escrita]    
-    data_teste["female"] = [female]
-    data_teste["male"] = [male]	
-    data_teste["A"] = [A]
-    data_teste["B"] = [B]
-    data_teste["C"] = [C]
-    data_teste["D"] =	[D]
-    data_teste["E"] =	[E]
-    data_teste["AD"] = [AD]
-    data_teste["BD"] = [BD]
-    data_teste["HS"] = [HS]
-    data_teste["SC"] = [SC]
-    data_teste["SHS"] = [SHS]
-    data_teste["FR"] = [FR]
-    data_teste["S"] = [S]
-    data_teste["completed"] = [completed]
-    data_teste["none"] = [none]
-
-
-    #imprime os dados de teste    
-    print(data_teste)
-
-    #realiza a predição
-    result = model.predict(data_teste)
-    
-    st.subheader("Nota de matematica predita:")
-    result = (round(result[0],2))
-    
-    st.write(result)
-   
+st.subheader("Nota de Matemática Predita:")
+st.write(round(predicted_math_score, 2))
