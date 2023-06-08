@@ -6,7 +6,14 @@ from pycaret.regression import load_model
 model = load_model('model')
 
 # Carregar o conjunto de dados
-dataset = pd.read_csv('estudantes.csv') 
+dataset = pd.read_csv('estudantes.csv')
+
+# Mapeamento dos valores
+gender_mapping = {"Feminino": 1, "Masculino": 0}
+ethnicity_mapping = {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5}
+education_mapping = {"AD": 1, "BD": 2, "HS": 3, "SC": 4, "SHS": 5}
+prep_course_mapping = {"Nenhum": 0, "Completo": 1}
+lunch_mapping = {"Gratuito/Reduzido": 0, "Padrão": 1}
 
 # Configurar a interface do Streamlit
 st.title("Predição de notas de matemática")
@@ -15,18 +22,11 @@ st.markdown("Este é um aplicativo de dados usado para prever notas de matemáti
 # Definir os atributos do aluno para a predição da nota de matemática
 nota_leitura = st.sidebar.number_input("Nota de Leitura")
 nota_escrita = st.sidebar.number_input("Nota de Escrita")
-genero = st.sidebar.selectbox("Gênero do Aluno", ("Feminino", "Masculino"))
-etinia = st.sidebar.selectbox("Raça/Etnia", ("A", "B", "C", "D", "E"))
-educacao_pais = st.sidebar.selectbox("Grau de Escolaridade dos Pais", ("AD", "BD", "HS", "SC", "SHS"))
-curso_preparacao = st.sidebar.selectbox("Curso Preparatório para Teste", ("Nenhum", "Completo"))
-almoco = st.sidebar.selectbox("Tipo de Almoço", ("Gratuito/Reduzido", "Padrão"))
-
-# Mapear os valores selecionados para os atributos correspondentes
-gender_mapping = {"Feminino": 1, "Masculino": 0}
-ethnicity_mapping = {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5}
-education_mapping = {"AD": 1, "BD": 2, "HS": 3, "SC": 4, "SHS": 5}
-prep_course_mapping = {"Nenhum": 0, "Completo": 1}
-lunch_mapping = {"Gratuito/Reduzido": 0, "Padrão": 1}
+genero = st.sidebar.selectbox("Gênero do Aluno", list(gender_mapping.keys()))
+etinia = st.sidebar.selectbox("Raça/Etnia", list(ethnicity_mapping.keys()))
+educacao_pais = st.sidebar.selectbox("Grau de Escolaridade dos Pais", list(education_mapping.keys()))
+curso_preparacao = st.sidebar.selectbox("Curso Preparatório para Teste", list(prep_course_mapping.keys()))
+almoco = st.sidebar.selectbox("Tipo de Almoço", list(lunch_mapping.keys()))
 
 # Criar o dataframe de teste com os valores selecionados
 data_teste = pd.DataFrame({
@@ -44,16 +44,15 @@ data_teste = pd.DataFrame({
     "HS": [1 if educacao_pais == "HS" else 0],
     "SC": [1 if educacao_pais == "SC" else 0],
     "SHS": [1 if educacao_pais == "SHS" else 0],
-    "FR": [1 if almoco == "Gratuito/Reduzido" else 0],
-    "S": [1 if almoco == "Padrão" else 0],
+    "FR": [lunch_mapping[almoco]],
+    "S": [1 - lunch_mapping[almoco]],
     "completed": [prep_course_mapping[curso_preparacao]],
     "none": [1 - prep_course_mapping[curso_preparacao]]
 })
 
 # Realizar a predição
-result = model.predict(data_teste)
-predicted_math_score = round(result[0], 2)
+predicted_math_score = model.predict(data_teste)[0]
 
 # Exibir a nota de matemática predita
 st.subheader("Nota de Matemática Predita:")
-st.write(predicted_math_score)
+st.write(round(predicted_math_score, 2))
