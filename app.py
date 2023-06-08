@@ -10,11 +10,11 @@ dataset = pd.read_csv('estudantes.csv')
 
 # Criando um dicionário para mapear os valores das variáveis categóricas
 categorical_mapping = {
-    'genero': {'Feminino': 1, 'Masculino': 0},
-    'etinia': {'A': 1, 'B': 0, 'C': 0, 'D': 0, 'E': 0},
-    'educacao_pais': {'AD': 1, 'BD': 0, 'HS': 0, 'SC': 0, 'SHS': 0},
-    'curso_preparacao': {'Completo': 1, 'Nenhum': 0},
-    'almoco': {'Gratuito/Reduzido': 1, 'Padrão': 0}
+    'female': {'Feminino': 1, 'Masculino': 0},
+    'A': {'A': 1, 'B': 0, 'C': 0, 'D': 0, 'E': 0},
+    'AD': {'AD': 1, 'BD': 0, 'HS': 0, 'SC': 0, 'SHS': 0},
+    'completed': {'Completo': 1, 'Nenhum': 0},
+    'FR': {'Gratuito/Reduzido': 1, 'Padrão': 0}
 }
 
 # Criando a interface do Streamlit
@@ -25,15 +25,15 @@ st.markdown("Este é um aplicativo que realiza a predição da nota de matemáti
 atributos_aluno = {
     'nota_leitura': st.sidebar.number_input("Nota de Leitura"),
     'nota_escrita': st.sidebar.number_input("Nota de Escrita"),
-    'genero': st.sidebar.selectbox("Gênero do Aluno", ('Feminino', 'Masculino')),
-    'etinia': st.sidebar.selectbox("Raça/Etnia", ('A', 'B', 'C', 'D', 'E')),
-    'educacao_pais': st.sidebar.selectbox("Grau de Escolaridade", ('BD', 'SC', 'MD', 'AD', 'HS', 'SHS')),
-    'curso_preparacao': st.sidebar.selectbox("Curso Preparatório para Teste", ('Nenhum', 'Completo')),
-    'almoco': st.sidebar.selectbox("Tipo de Almoço", ('Gratuito/Reduzido', 'Padrão'))
+    'female': st.sidebar.selectbox("Gênero do Aluno", ('Feminino', 'Masculino')),
+    'A': st.sidebar.selectbox("Raça/Etnia", ('A', 'B', 'C', 'D', 'E')),
+    'AD': st.sidebar.selectbox("Grau de Escolaridade", ('BD', 'SC', 'MD', 'AD', 'HS', 'SHS')),
+    'completed': st.sidebar.selectbox("Curso Preparatório para Teste", ('Nenhum', 'Completo')),
+    'FR': st.sidebar.selectbox("Tipo de Almoço", ('Gratuito/Reduzido', 'Padrão'))
 }
 
 # Selecionando as colunas relevantes do dataset
-colunas_relevantes = ['nota_leitura', 'nota_escrita', 'genero', 'etinia', 'educacao_pais', 'curso_preparacao', 'almoco']
+colunas_relevantes = ['nota_leitura', 'nota_escrita', 'female', 'A', 'AD', 'completed', 'FR']
 data_teste = dataset[colunas_relevantes].copy()
 
 # Preenchendo o data_teste com base nos atributos do aluno
@@ -47,7 +47,7 @@ for col, mapping in categorical_mapping.items():
 btn_predict = st.sidebar.button("Realizar Predição")
 
 if btn_predict:
-    result = model.predict(data_teste[-1:])
+    result = model.predict(data_teste.tail(1))
     result = round(result[0], 2)
 
     st.subheader("Nota de matemática predita:")
