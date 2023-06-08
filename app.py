@@ -37,7 +37,8 @@ atributos_aluno = {
 # Selecionando as colunas relevantes do dataset
 colunas_relevantes = ['nota_leitura', 'nota_escrita', 'female', 'A', 'AD', 'completed', 'FR']
 #data_teste = dataset[colunas_relevantes].copy()
-data_teste = dataset.loc[:, colunas_relevantes].copy()
+#data_teste = dataset.loc[:, colunas_relevantes].copy()
+data_teste = dataset[colunas_relevantes].copy()
 
 # Preenchendo o data_teste com base nos atributos do aluno
 data_teste = data_teste.append(atributos_aluno, ignore_index=True)
