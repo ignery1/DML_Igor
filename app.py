@@ -2,24 +2,18 @@ import pandas as pd
 import streamlit as st
 from pycaret.regression import load_model
 
-# Carregar o modelo treinado
 model = load_model('model')
-
-# Carregar o conjunto de dados
 dataset = pd.read_csv('estudantes.csv')
 
-# Mapeamento dos valores
 gender_mapping = {"Feminino": 1, "Masculino": 0}
 ethnicity_mapping = {"A": 1, "B": 2, "C": 3, "D": 4, "E": 5}
 education_mapping = {"AD": 1, "BD": 2, "HS": 3, "SC": 4, "SHS": 5}
 prep_course_mapping = {"Nenhum": 0, "Completo": 1}
 lunch_mapping = {"Gratuito/Reduzido": 0, "Padrão": 1}
 
-# Configurar a interface do Streamlit
 st.title("Predição de notas de matemática")
 st.markdown("Este é um aplicativo de dados usado para prever notas de matemática usando Machine Learning.")
 
-# Definir os atributos do aluno para a predição da nota de matemática
 nota_leitura = st.sidebar.number_input("Nota de Leitura")
 nota_escrita = st.sidebar.number_input("Nota de Escrita")
 genero = st.sidebar.selectbox("Gênero do Aluno", list(gender_mapping.keys()))
@@ -28,7 +22,6 @@ educacao_pais = st.sidebar.selectbox("Grau de Escolaridade dos Pais", list(educa
 curso_preparacao = st.sidebar.selectbox("Curso Preparatório para Teste", list(prep_course_mapping.keys()))
 almoco = st.sidebar.selectbox("Tipo de Almoço", list(lunch_mapping.keys()))
 
-# Criar o dataframe de teste com os valores selecionados
 data_teste = pd.DataFrame({
     "nota_leitura": [nota_leitura],
     "nota_escrita": [nota_escrita],
@@ -50,9 +43,7 @@ data_teste = pd.DataFrame({
     "none": [1 - prep_course_mapping[curso_preparacao]]
 })
 
-# Realizar a predição
 predicted_math_score = model.predict(data_teste)[0]
 
-# Exibir a nota de matemática predita
 st.subheader("Nota de Matemática Predita:")
 st.write(round(predicted_math_score, 2))
